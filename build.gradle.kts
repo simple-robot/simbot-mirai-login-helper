@@ -31,10 +31,10 @@ dependencies {
     // https://stackoverflow.com/questions/25431380/capturing-browser-logs-with-selenium-webdriver-using-java
     // https://github.com/lightbody/browsermob-proxy#using-with-selenium
     implementation("net.lightbody.bmp:browsermob-core:2.1.5")
-    // https://github.com/lightbody/browsermob-proxy/blob/master/mitm/README.md
-    implementation("org.littleshoot:littleproxy:1.1.2")
-    implementation("net.lightbody.bmp:mitm:2.1.5")
 
+    // https://github.com/lightbody/browsermob-proxy/blob/master/mitm/README.md
+    // implementation("org.littleshoot:littleproxy:1.1.2")
+    // implementation("net.lightbody.bmp:mitm:2.1.5")
 
 
     // simbot3-mirai
