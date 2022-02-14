@@ -23,6 +23,7 @@ val CenterModifier = Modifier
 @Preview
 @Composable
 fun Home(setTitle: SetTitle, resetStep: SetStep) {
+    setTitle(null)
     Box(
         modifier = CenterModifier // Modifier.fillMaxSize()
     ) {
