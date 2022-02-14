@@ -4,21 +4,19 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.*
+import androidx.compose.material.OutlinedButton
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.RadioButton
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.colorspace.ColorSpaces
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.text.*
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import love.forte.simbot.mlh.DriverSelector
-import java.awt.color.ColorSpace
 
 /**
  * 登录bot并根据操作进行
@@ -135,7 +133,7 @@ fun selectDriver() {
                                     !isWindows && !isMac -> Color(0xffffeb46) // Color.Yellow
                                     isWindows && !it.windowsAble -> Color.Red // MaterialTheme.colors.onError
                                     isMac && !it.macAble -> Color.Red
-                                    else ->  Color(0xff91a4fc) // Color.Blue // MaterialTheme.colors.onBackground
+                                    else -> Color(0xff91a4fc) // Color.Blue // MaterialTheme.colors.onBackground
                                 }
                             )
                         ) {
