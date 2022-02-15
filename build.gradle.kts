@@ -67,12 +67,15 @@ tasks.withType<KotlinCompile> {
 compose.desktop {
     application {
         mainClass = "love.forte.simbot.mlh.window.WindowMainKt"
+        jvmArgs += listOf("-Xmx2G")
         nativeDistributions {
             targetFormats(
                 TargetFormat.Dmg,
                 TargetFormat.Deb,
                 TargetFormat.Exe
             )
+
+
 
             description = "simbot下mirai组件首次设备登录辅助工具"
             packageName = "simbot-mirai-login-helper"
