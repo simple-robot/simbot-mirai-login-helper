@@ -5,6 +5,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
@@ -14,7 +15,7 @@ typealias SetTitle = (String?) -> Unit
 @Suppress("FunctionName")
 @Composable
 @Preview
-fun App(resetTitle: SetTitle, exit: () -> Unit) {
+fun FrameWindowScope.App(resetTitle: SetTitle, exit: () -> Unit) {
 
     var step by remember { mutableStateOf<Step?>(null) }
 
@@ -27,7 +28,7 @@ fun App(resetTitle: SetTitle, exit: () -> Unit) {
         if (target == null) {
             Home(resetTitle, setStep, exit)
         } else {
-            target.doContent(resetTitle, setStep)
+            target.doContent(this@App, resetTitle, setStep)
         }
     }
 

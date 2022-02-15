@@ -9,19 +9,29 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.AwtWindow
+import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
+import java.awt.Desktop
+import java.awt.FileDialog
+import java.io.File
 
 
 @Preview
 @Composable
-fun installCer(setStep: SetStep) {
+fun FrameWindowScope.installCer(setStep: SetStep) {
+    var showFileSaveDialog by remember { mutableStateOf(false) }
+
+    if (showFileSaveDialog) {
+        saveCerWindow()
+    }
+
     Box(
         modifier = Modifier.fillMaxSize().padding(20.dp).wrapContentHeight(Alignment.Top)
             .wrapContentWidth(Alignment.CenterHorizontally),
@@ -29,12 +39,8 @@ fun installCer(setStep: SetStep) {
         Column(
             modifier = Modifier.padding(horizontal = 5.dp),
         ) {
-            Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
-                // TODO save file to local
-            }) {
-                Text("保存 $CER_FILE_NAME 到本地")
-            }
 
+            // 说明/提示
             var showTipWindow by remember { mutableStateOf(false) }
             Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
                 showTipWindow = !showTipWindow
@@ -48,6 +54,27 @@ fun installCer(setStep: SetStep) {
             }
 
 
+            // 安装按钮
+            Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
+                desktop(Desktop.Action.OPEN) { desktop ->
+                    File(".cache").also {
+                        it.mkdir()
+                        val cerFile = File(it, CER_FILE_NAME)
+                        cerFile.createNewFile()
+                        cerFile.writeText(CER)
+                        desktop.open(cerFile)
+                    }
+                }.orDo {
+                    showFileSaveDialog = true
+                }
+
+
+            }) {
+                Text("安装 $CER_FILE_NAME")
+            }
+
+
+
             OutlinedButton(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = { setStep(null) }) {
                 Text("返回")
             }
@@ -56,6 +83,32 @@ fun installCer(setStep: SetStep) {
     }
 
 
+}
+
+@Composable
+fun FrameWindowScope.saveCerWindow() {
+    AwtWindow(
+        create = {
+            object : FileDialog(window, "保存CER文件", SAVE) {
+                override fun setVisible(value: Boolean) {
+                    super.setVisible(value)
+                    if (value) {
+                        if (file != null) {
+                            val dir = File(directory)
+                            val save = dir.resolve(file)
+                            dir.mkdirs()
+                            save.createNewFile()
+                            save.writeText(CER)
+                        } else {
+                            // nothing
+                        }
+                    }
+                }
+            }
+        },
+        dispose = java.awt.Window::dispose,
+
+        )
 }
 
 

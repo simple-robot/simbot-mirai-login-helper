@@ -25,6 +25,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import java.awt.Desktop
+import java.io.File
+import java.net.URI
 
 val CenterModifier = Modifier
     .fillMaxSize()
@@ -41,6 +44,8 @@ fun Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
     val onExitButtonInteractionSource = MutableInteractionSource()
     var onExitButton by remember { mutableStateOf(false) }
     val brushColorA by animateColorAsState(if (onExitButton) Color.Red else Color.Green)
+
+    Text(File(".cache").absolutePath)
 
     LaunchedEffect(Unit) {
         onExitButtonInteractionSource.interactions
@@ -126,7 +131,11 @@ private fun logo() {
                     onClickLabel = "simbot",
                     role = Role.Image,
                 ) {
-                    showNoDesktopWarn = true
+                    desktop(Desktop.Action.BROWSE) {
+                        it.browse(URI("https://github.com/ForteScarlet/simpler-robot"))
+                    }.orDo {
+                        showNoDesktopWarn = true
+                    }
                 }
         )
     }

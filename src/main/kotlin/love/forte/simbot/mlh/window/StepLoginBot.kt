@@ -1,7 +1,6 @@
 package love.forte.simbot.mlh.window
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.desktop.ui.tooling.preview.Preview
@@ -52,14 +51,14 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
 
                     // 输入信息
                     inputInfo(
-                        code,
+                        code, codeErr,
                         {
                             code = it
                             if (pass.isNotEmpty()) {
                                 codeErr = false
                             }
                         },
-                        pass,
+                        pass, passErr,
                         {
                             pass = it
                             if (pass.isNotEmpty()) {
@@ -150,8 +149,8 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
  */
 @Composable
 fun inputInfo(
-    code: String, setCode: (String) -> Unit,
-    pass: String, setPass: (String) -> Unit,
+    code: String, codeErr: Boolean, setCode: (String) -> Unit,
+    pass: String, passErr: Boolean, setPass: (String) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -163,12 +162,15 @@ fun inputInfo(
         Column {
             OutlinedTextField(
                 value = code,
+                isError = codeErr,
                 onValueChange = { setCode(it) },
                 label = { Text("账号") },
-                placeholder = { Text("请输入账号") }
-            )
+                placeholder = { Text("请输入账号") },
+
+                )
             OutlinedTextField(
                 value = pass,
+                isError = passErr,
                 onValueChange = { setPass(it) },
                 label = { Text("密码") },
                 visualTransformation = PasswordVisualTransformation(),
@@ -235,8 +237,8 @@ fun selectDriver(currentDriver: WebDriverType?, setDriver: (WebDriverType?) -> U
                     if (currentDriver != null) {
                         //val tooltip: String?
                         tooltip = when {
-                            isWindows && !currentDriver.windowsAble -> "此浏览器驱动仅支持windows系统"
-                            isMac && !currentDriver.macAble -> "此浏览器驱动仅支持macOS系统"
+                            isWindows && !currentDriver.windowsAble -> "此浏览器不支持windows系统"
+                            isMac && !currentDriver.macAble -> "此浏览器不支持macOS系统"
                             else -> null
                         }
                         Row {

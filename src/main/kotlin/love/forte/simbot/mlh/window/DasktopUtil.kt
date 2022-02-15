@@ -3,24 +3,48 @@ package love.forte.simbot.mlh.window
 import java.awt.Desktop
 import java.awt.Desktop.Action
 
+@PublishedApi
+internal object DesktopNotSupport
 
-fun desktop(): Desktop? {
-    if (!Desktop.isDesktopSupported()) {
-        return null
+@JvmInline
+value class DesktopResult<T>(val result: Any?) {
+
+    @Suppress("UNCHECKED_CAST")
+    inline fun or(action: () -> T): T {
+        return if (result === DesktopNotSupport) action() else result as T
     }
 
-    return Desktop.getDesktop()
+    @Suppress("UNCHECKED_CAST")
+    inline fun orDo(action: () -> Unit): T? {
+        if (result === DesktopNotSupport) {
+            action()
+            return null
+        }
+        return result as T
+    }
+
+    @Suppress("NOTHING_TO_INLINE", "UNCHECKED_CAST")
+    inline fun orNull(): T? = if (result === DesktopNotSupport) null else result as T
 }
 
 
-fun desktop(vararg actions: Action): Desktop? {
+inline fun <T> desktop(action: (desktop: Desktop) -> T): DesktopResult<T> {
     if (!Desktop.isDesktopSupported()) {
-        return null
+        return DesktopResult(DesktopNotSupport)
+    }
+
+    return Desktop.getDesktop()?.let { DesktopResult(action(it)) } ?: DesktopResult(DesktopNotSupport)
+}
+
+
+inline fun <T> desktop(vararg actions: Action, action: (desktop: Desktop) -> T): DesktopResult<T> {
+    if (!Desktop.isDesktopSupported()) {
+        return DesktopResult(DesktopNotSupport)
     }
 
     return Desktop.getDesktop().takeIf { desktop ->
         actions.all { desktop.isSupported(it) }
-    }
+    }?.let { DesktopResult(action(it)) } ?: DesktopResult(DesktopNotSupport)
 }
 
 
