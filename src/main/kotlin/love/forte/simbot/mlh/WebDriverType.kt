@@ -6,7 +6,7 @@ import io.github.bonigarcia.wdm.WebDriverManager
  *
  * @author ForteScarlet
  */
-enum class DriverSelector(
+enum class WebDriverType(
     val windowsAble: Boolean,
     val macAble: Boolean,
     private val driverManagerFactory: () -> WebDriverManager
@@ -45,6 +45,8 @@ enum class DriverSelector(
         true, true,
         { WebDriverManager.operadriver() }
     ),
+    ;
 
 
+    fun driverManager(): WebDriverManager = driverManagerFactory()
 }

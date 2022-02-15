@@ -58,13 +58,39 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
+kotlin {
+    sourceSets.all {
+        languageSettings {
+            optIn("kotlin.OptIn")
+        }
+    }
+}
+
 compose.desktop {
     application {
         mainClass = "MainKt"
         nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            targetFormats(
+                TargetFormat.Dmg,
+                TargetFormat.Deb,
+                TargetFormat.Exe
+            )
+
+            description = "simbot下mirai组件首次设备登录辅助工具"
             packageName = "simbot-mirai-login-helper"
             packageVersion = "1.0.0"
+            val iconFile = File(project.projectDir, "src/main/resources/logo.png")
+            macOS {
+                this.iconFile.set(iconFile)
+            }
+            linux {
+                shortcut = true
+            }
+            windows {
+                shortcut = true
+            }
+
+
         }
     }
 }

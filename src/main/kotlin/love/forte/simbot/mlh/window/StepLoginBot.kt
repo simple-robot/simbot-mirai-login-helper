@@ -1,22 +1,21 @@
 package love.forte.simbot.mlh.window
 
+import androidx.compose.animation.*
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.*
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import love.forte.simbot.mlh.DriverSelector
+import love.forte.simbot.mlh.WebDriverType
 
 /**
  * 登录bot并根据操作进行
@@ -47,9 +46,14 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
                     // 选择浏览器
                     selectDriver()
 
+
                     // 返回
                     OutlinedButton(
-                        onClick = { setStep(null) }
+                        onClick = { setStep(null) },
+                        modifier = Modifier
+                            .wrapContentHeight(Alignment.Top)
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+
                     ) {
                         Text("返回")
                     }
@@ -66,7 +70,9 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
 
 }
 
-
+/**
+ * 账号信息输入
+ */
 @Composable
 fun inputInfo(
     code: String, setCode: (String) -> Unit,
@@ -97,66 +103,112 @@ fun inputInfo(
     }
 }
 
-
-@OptIn(ExperimentalTextApi::class)
+/**
+ * 选择浏览器驱动
+ */
+@OptIn(ExperimentalTextApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun selectDriver() {
     val verticalScrollState = rememberScrollState(0)
     Box(
         modifier = Modifier
-            .height(500.dp)
+            .height(300.dp)
             .fillMaxSize()
             .padding(top = 5.dp)
+            .border(
+                width = 2.dp,
+                brush = Brush.sweepGradient(listOf(Color.Gray, Color.Red, Color.Blue)),
+                shape = MaterialTheme.shapes.small
+            )
     ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            var selectedDriver: DriverSelector? by remember { mutableStateOf(null) }
+            var selectedDriver: WebDriverType? by remember { mutableStateOf(null) }
+            val driver = selectedDriver
+            val currentOs = System.getProperty("os.name")?.lowercase() ?: ""
+            val isWindows = "window" in currentOs
+            val isMac = "mac" in currentOs
 
-            Text(
+
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .height(40.dp)
                     .padding(10.dp)
                     .wrapContentHeight(Alignment.Top)
                     .wrapContentWidth(Alignment.CenterHorizontally),
-                text = selectedDriver?.let {
-                    buildAnnotatedString {
-                        append("使用 ")
-                        val name = it.name
-                        val currentOs = System.getProperty("os.name")?.lowercase() ?: ""
-                        val isWindows = "window" in currentOs
-                        val isMac = "mac" in currentOs
-                        withStyle(
-                            TextStyle.Default.toSpanStyle().copy(
-                                fontWeight = FontWeight.Bold,
-                                color = when {
-                                    !isWindows && !isMac -> Color(0xffffeb46) // Color.Yellow
-                                    isWindows && !it.windowsAble -> Color.Red // MaterialTheme.colors.onError
-                                    isMac && !it.macAble -> Color.Red
-                                    else -> Color(0xff91a4fc) // Color.Blue // MaterialTheme.colors.onBackground
-                                }
-                            )
-                        ) {
-                            append(name)
+            ) {
+                // nothing
+                AnimatedVisibility(
+                    visible = driver == null
+                ) {
+                    Text("选择浏览器驱动")
+                }
+
+                // selected
+                AnimatedVisibility(
+                    visible = driver != null
+                ) {
+                    if (driver != null) {
+                        val color = when {
+                            !isWindows && !isMac -> Color(0xffffeb46) // Color.Yellow
+                            isWindows && !driver.windowsAble -> Color.Red // MaterialTheme.colors.onError
+                            isMac && !driver.macAble -> Color.Red
+                            else -> Color(0xff91a4fc) // Color.Blue // MaterialTheme.colors.onBackground
                         }
+                        Row {
+                            Text("使用 ")
 
+                            AnimatedContent(
+                                targetState = driver,
+                                transitionSpec = {
+                                    // see https://developer.android.google.cn/jetpack/compose/animation?authuser=0#animatedcontent
 
-                        append(" 浏览器")
+                                    // Compare the incoming number with the previous number.
+                                    if (targetState.ordinal > initialState.ordinal) {
+                                        // If the target number is larger, it slides up and fades in
+                                        // while the initial (smaller) number slides up and fades out.
+                                        slideInVertically { height -> height } + fadeIn() with
+                                                slideOutVertically { height -> -height } + fadeOut()
+                                    } else {
+                                        // If the target number is smaller, it slides down and fades in
+                                        // while the initial number slides down and fades out.
+                                        slideInVertically { height -> -height } + fadeIn() with
+                                                slideOutVertically { height -> height } + fadeOut()
+                                    }.using(
+                                        // Disable clipping since the faded slide-in/out should
+                                        // be displayed out of bounds.
+                                        SizeTransform(clip = false)
+                                    )
+                                }
+                            ) { target ->
+                                Text(
+                                    fontWeight = FontWeight.Bold,
+                                    color = color,
+                                    text = target.name
+                                )
+                            }
+
+                            Text(" 浏览器")
+                        }
                     }
-                } ?: AnnotatedString("选择浏览器驱动")
-            )
+
+                }
+            }
 
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(verticalScrollState)
-                    .padding(top = 5.dp, start = 100.dp)
-                    .background(Color.White)
+                    .padding(top = 5.dp, start = 100.dp, end = 100.dp)
                     .selectableGroup()
             ) {
 
-                DriverSelector.values().forEach { driver ->
-                    val onClick: () -> Unit = { selectedDriver = driver }
+                WebDriverType.values().forEach { driver ->
+                    val onClick: () -> Unit = {
+                        selectedDriver = if (selectedDriver == driver) null else driver
+                    }
                     Row {
                         RadioButton(
                             selected = selectedDriver == driver,

@@ -9,6 +9,8 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -46,7 +48,7 @@ fun installCer(setStep: SetStep) {
             }
 
 
-            Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = { setStep(null) }) {
+            OutlinedButton(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = { setStep(null) }) {
                 Text("返回")
             }
 
