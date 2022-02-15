@@ -18,6 +18,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.AwtWindow
 import androidx.compose.ui.window.FrameWindowScope
 import androidx.compose.ui.window.Window
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runInterruptible
 import java.awt.Desktop
 import java.awt.FileDialog
 import java.io.File
@@ -26,10 +30,11 @@ import java.io.File
 @Preview
 @Composable
 fun FrameWindowScope.installCer(setStep: SetStep) {
+    val scope = rememberCoroutineScope()
     var showFileSaveDialog by remember { mutableStateOf(false) }
 
     if (showFileSaveDialog) {
-        saveCerWindow()
+        saveCerWindow(scope)
     }
 
     Box(
@@ -57,12 +62,16 @@ fun FrameWindowScope.installCer(setStep: SetStep) {
             // 安装按钮
             Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
                 desktop(Desktop.Action.OPEN) { desktop ->
-                    File(".cache").also {
-                        it.mkdir()
-                        val cerFile = File(it, CER_FILE_NAME)
-                        cerFile.createNewFile()
-                        cerFile.writeText(CER)
-                        desktop.open(cerFile)
+                    scope.launch(Dispatchers.IO) {
+                        runInterruptible {
+                            File(".cache").also {
+                                it.mkdir()
+                                val cerFile = File(it, CER_FILE_NAME)
+                                cerFile.createNewFile()
+                                cerFile.writeText(CER)
+                                desktop.open(cerFile)
+                            }
+                        }
                     }
                 }.orDo {
                     showFileSaveDialog = true
@@ -86,7 +95,7 @@ fun FrameWindowScope.installCer(setStep: SetStep) {
 }
 
 @Composable
-fun FrameWindowScope.saveCerWindow() {
+fun FrameWindowScope.saveCerWindow(scope: CoroutineScope) {
     AwtWindow(
         create = {
             object : FileDialog(window, "保存CER文件", SAVE) {
@@ -94,11 +103,15 @@ fun FrameWindowScope.saveCerWindow() {
                     super.setVisible(value)
                     if (value) {
                         if (file != null) {
-                            val dir = File(directory)
-                            val save = dir.resolve(file)
-                            dir.mkdirs()
-                            save.createNewFile()
-                            save.writeText(CER)
+                            scope.launch(Dispatchers.IO) {
+                                runInterruptible {
+                                    val dir = File(directory)
+                                    val save = dir.resolve(file)
+                                    dir.mkdirs()
+                                    save.createNewFile()
+                                    save.writeText(CER)
+                                }
+                            }
                         } else {
                             // nothing
                         }
