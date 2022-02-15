@@ -6,7 +6,7 @@ import java.net.URL
 
 @Suppress("MemberVisibilityCanBePrivate")
 object Logo {
-    private val logoResource: URL = Logo::class.java.classLoader.getResource("logo.png")!!
+    private val logoResource: URL = Logo::class.java.classLoader.getResource("icon.png")!!
     val logoBitmap = logoResource.openStream().use(::loadImageBitmap)
     val painter = BitmapPainter(logoBitmap)
 }

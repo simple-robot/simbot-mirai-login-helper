@@ -80,17 +80,15 @@ compose.desktop {
             description = "simbot下mirai组件首次设备登录辅助工具"
             packageName = "simbot-mirai-login-helper"
             packageVersion = "1.0.0"
-            val iconFile = File(project.projectDir, "icon.ico")
-
             macOS {
-                this.iconFile.set(iconFile)
+                this.iconFile.set(project.file("icon.icns"))
             }
             linux {
-                this.iconFile.set(iconFile)
+                this.iconFile.set(project.file("icon.png"))
                 shortcut = true
             }
             windows {
-                this.iconFile.set(iconFile)
+                this.iconFile.set(project.file("icon.ico"))
                 shortcut = true
             }
 
