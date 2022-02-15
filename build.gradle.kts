@@ -67,7 +67,7 @@ tasks.withType<KotlinCompile> {
 compose.desktop {
     application {
         mainClass = "love.forte.simbot.mlh.window.WindowMainKt"
-        jvmArgs += listOf("-Xmx2G")
+        //jvmArgs += listOf("-Xmx2G")
         nativeDistributions {
             targetFormats(
                 TargetFormat.Dmg,
