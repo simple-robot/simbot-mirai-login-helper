@@ -5,8 +5,6 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
@@ -16,7 +14,7 @@ typealias SetTitle = (String?) -> Unit
 @Suppress("FunctionName")
 @Composable
 @Preview
-fun App(resetTitle: SetTitle) {
+fun App(resetTitle: SetTitle, exit: () -> Unit) {
 
     var step by remember { mutableStateOf<Step?>(null) }
 
@@ -27,7 +25,7 @@ fun App(resetTitle: SetTitle) {
         targetState = step
     ) { target ->
         if (target == null) {
-            Home(resetTitle, setStep)
+            Home(resetTitle, setStep, exit)
         } else {
             target.doContent(resetTitle, setStep)
         }
@@ -45,8 +43,10 @@ fun main() = application {
             title = title,
             icon = Logo.painter
         ) {
-            App {
-                title = it ?: default
+            App(
+                { title = it ?: default },
+            ) {
+                exitApplication()
             }
         }
     }

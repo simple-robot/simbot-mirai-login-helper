@@ -47,6 +47,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.1")
 
     testImplementation(kotlin("test"))
+    implementation(compose.desktop.common)
     implementation(compose.desktop.currentOs)
 }
 
@@ -55,20 +56,17 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
-}
-
-kotlin {
-    sourceSets.all {
-        languageSettings {
-            optIn("kotlin.OptIn")
-        }
+    kotlinOptions {
+        jvmTarget = "11"
+        javaParameters = true
+        //freeCompilerArgs = freeCompilerArgs + listOf("-opt-in=kotlin.RequiresOptIn")
     }
 }
 
+
 compose.desktop {
     application {
-        mainClass = "MainKt"
+        mainClass = "love.forte.simbot.mlh.window.WindowMainKt"
         nativeDistributions {
             targetFormats(
                 TargetFormat.Dmg,
@@ -79,14 +77,17 @@ compose.desktop {
             description = "simbot下mirai组件首次设备登录辅助工具"
             packageName = "simbot-mirai-login-helper"
             packageVersion = "1.0.0"
-            val iconFile = File(project.projectDir, "src/main/resources/logo.png")
+            val iconFile = File(project.projectDir, "icon.ico")
+
             macOS {
                 this.iconFile.set(iconFile)
             }
             linux {
+                this.iconFile.set(iconFile)
                 shortcut = true
             }
             windows {
+                this.iconFile.set(iconFile)
                 shortcut = true
             }
 

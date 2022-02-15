@@ -10,6 +10,7 @@ import love.forte.simbot.mlh.WebDriverType
 @Composable
 fun runLoginBot(
     code: String,
+    pass: String,
     driver: WebDriverType,
     onCloseRequest: () -> Unit
 ) {

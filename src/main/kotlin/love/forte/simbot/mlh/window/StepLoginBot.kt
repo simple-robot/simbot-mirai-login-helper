@@ -1,10 +1,14 @@
 package love.forte.simbot.mlh.window
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,10 +24,21 @@ import love.forte.simbot.mlh.WebDriverType
 /**
  * 登录bot并根据操作进行
  */
+@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun loginBot(setTitle: SetTitle, setStep: SetStep) {
     val verticalScrollState = rememberScrollState(0)
+    var selectedDriver: WebDriverType? by remember { mutableStateOf(null) }
+    var code by remember { mutableStateOf("") }
+    var codeErr by remember { mutableStateOf(false) }
+    var pass by remember { mutableStateOf("") }
+    var passErr by remember { mutableStateOf(false) }
+    var onLoginBot by remember { mutableStateOf(false) }
+    var warningMessage: String? by remember { mutableStateOf(null) }
+
+
+
     Box {
         Box(
             modifier = CenterModifier.verticalScroll(verticalScrollState)
@@ -34,28 +49,88 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
                 Column(
                     modifier = Modifier.padding(top = 5.dp)
                 ) {
-                    var code by remember { mutableStateOf("") }
-                    var pass by remember { mutableStateOf("") }
 
                     // 输入信息
                     inputInfo(
-                        code, { code = it },
-                        pass, { pass = it }
+                        code,
+                        {
+                            code = it
+                            if (pass.isNotEmpty()) {
+                                codeErr = false
+                            }
+                        },
+                        pass,
+                        {
+                            pass = it
+                            if (pass.isNotEmpty()) {
+                                passErr = false
+                            }
+                        }
                     )
 
                     // 选择浏览器
-                    selectDriver()
+                    selectDriver(selectedDriver) { selectedDriver = it }
+
+                    // 底端按钮
+                    Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                        Button(
+                            onClick = {
+                                when {
+                                    code.isEmpty() -> {
+                                        warningMessage = "账号不可为空"
+                                        codeErr = true
+                                    }
+                                    pass.isEmpty() -> {
+                                        warningMessage = "密码不可为空"
+                                        passErr = true
+                                    }
+                                    else -> {
+                                        onLoginBot = true
+                                    }
+                                }
+                            }
+                        ) {
+                            Text("验证")
+                        }
+
+                        // 返回
+                        OutlinedButton(
+                            onClick = { setStep(null) },
+                            modifier = Modifier
+                                .wrapContentHeight(Alignment.Top)
+                                .wrapContentWidth(Alignment.CenterHorizontally)
+
+                        ) {
+                            Text("返回")
+                        }
+                    }
 
 
-                    // 返回
-                    OutlinedButton(
-                        onClick = { setStep(null) },
-                        modifier = Modifier
-                            .wrapContentHeight(Alignment.Top)
-                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    if (warningMessage != null) {
+                        AlertDialog(
+                            modifier = Modifier.background(Color.Gray)
+                                .height(200.dp)
+                                .width(400.dp),
+                            title = { Text("警告") },
+                            onDismissRequest = {},
+                            buttons = {
+                                Box(Modifier.fillMaxWidth().padding(10.dp)) {
+                                    Button(
+                                        modifier = Modifier.wrapContentWidth(Alignment.End),
+                                        onClick = { warningMessage = null },
+                                    ) { Text("确认") }
+                                }
+                            },
+                            text = { Text(warningMessage ?: "") }
+                        )
+                    }
 
-                    ) {
-                        Text("返回")
+
+                    AnimatedVisibility(onLoginBot) {
+                        @Suppress("RemoveSingleExpressionStringTemplate")
+                        runLoginBot(code, pass, selectedDriver!!) {
+                            onLoginBot = false
+                        }
                     }
                 }
             }
@@ -108,8 +183,17 @@ fun inputInfo(
  */
 @OptIn(ExperimentalTextApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun selectDriver() {
+fun selectDriver(currentDriver: WebDriverType?, setDriver: (WebDriverType?) -> Unit) {
     val verticalScrollState = rememberScrollState(0)
+    var tooltip: String? by remember { mutableStateOf(null) }
+    val browserTextColor by animateColorAsState(
+        targetValue = if (tooltip == null) Color(0xff91a4fc) else Color.Red,
+        animationSpec = tween(
+            durationMillis = 500,
+            easing = LinearEasing
+        )
+    )
+
     Box(
         modifier = Modifier
             .height(300.dp)
@@ -124,8 +208,6 @@ fun selectDriver() {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            var selectedDriver: WebDriverType? by remember { mutableStateOf(null) }
-            val driver = selectedDriver
             val currentOs = System.getProperty("os.name")?.lowercase() ?: ""
             val isWindows = "window" in currentOs
             val isMac = "mac" in currentOs
@@ -141,27 +223,27 @@ fun selectDriver() {
             ) {
                 // nothing
                 AnimatedVisibility(
-                    visible = driver == null
+                    visible = currentDriver == null
                 ) {
                     Text("选择浏览器驱动")
                 }
 
                 // selected
                 AnimatedVisibility(
-                    visible = driver != null
+                    visible = currentDriver != null
                 ) {
-                    if (driver != null) {
-                        val color = when {
-                            !isWindows && !isMac -> Color(0xffffeb46) // Color.Yellow
-                            isWindows && !driver.windowsAble -> Color.Red // MaterialTheme.colors.onError
-                            isMac && !driver.macAble -> Color.Red
-                            else -> Color(0xff91a4fc) // Color.Blue // MaterialTheme.colors.onBackground
+                    if (currentDriver != null) {
+                        //val tooltip: String?
+                        tooltip = when {
+                            isWindows && !currentDriver.windowsAble -> "此浏览器驱动仅支持windows系统"
+                            isMac && !currentDriver.macAble -> "此浏览器驱动仅支持macOS系统"
+                            else -> null
                         }
                         Row {
                             Text("使用 ")
 
                             AnimatedContent(
-                                targetState = driver,
+                                targetState = currentDriver,
                                 transitionSpec = {
                                     // see https://developer.android.google.cn/jetpack/compose/animation?authuser=0#animatedcontent
 
@@ -183,11 +265,42 @@ fun selectDriver() {
                                     )
                                 }
                             ) { target ->
-                                Text(
-                                    fontWeight = FontWeight.Bold,
-                                    color = color,
-                                    text = target.name
-                                )
+
+                                val currentTooltip = tooltip
+                                if (currentTooltip == null) {
+                                    Text(
+                                        fontWeight = FontWeight.Bold,
+                                        color = browserTextColor,
+                                        text = target.name
+                                    )
+                                } else {
+                                    TooltipArea(
+                                        tooltip = {
+                                            Box(
+                                                modifier = Modifier.background(
+                                                    color = Color.Black,
+                                                    shape = RoundedCornerShape(5.dp),
+                                                ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = currentTooltip,
+                                                    color = Color.White,
+                                                    modifier = Modifier.padding(6.dp)
+                                                )
+                                            }
+                                        },
+                                        delayMillis = 200,
+                                    ) {
+                                        Text(
+                                            fontWeight = FontWeight.Bold,
+                                            color = browserTextColor,
+                                            text = target.name
+                                        )
+                                    }
+
+                                }
+
                             }
 
                             Text(" 浏览器")
@@ -207,11 +320,11 @@ fun selectDriver() {
 
                 WebDriverType.values().forEach { driver ->
                     val onClick: () -> Unit = {
-                        selectedDriver = if (selectedDriver == driver) null else driver
+                        setDriver(if (currentDriver == driver) null else driver)
                     }
                     Row {
                         RadioButton(
-                            selected = selectedDriver == driver,
+                            selected = currentDriver == driver,
                             modifier = Modifier.size(30.dp),
                             onClick = onClick
                         )
