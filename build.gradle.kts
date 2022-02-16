@@ -3,9 +3,9 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.5.31"
-    kotlin("plugin.serialization") version "1.5.31"
-    id("org.jetbrains.compose") version "1.0.0"
+    kotlin("jvm") version "1.6.10"
+    kotlin("plugin.serialization") version "1.6.10"
+    id("org.jetbrains.compose") version "1.0.1"
 }
 
 group = "love.forte.simbot"
@@ -42,7 +42,7 @@ dependencies {
     implementation("com.google.zxing:javase:3.4.1")
     // simbot3-mirai
     implementation("love.forte.simbot.component:simbot-component-mirai-core:3.0.0.preview.3.0-292.0.1")
-    implementation("love.forte.simbot.component:simbot-component-mirai-boot:3.0.0.preview.3.0-292.0.1")
+    //implementation("love.forte.simbot.component:simbot-component-mirai-boot:3.0.0.preview.3.0-292.0.1")
 
     // log4j2
     implementation("org.apache.logging.log4j:log4j-api:2.17.1")
@@ -61,8 +61,10 @@ tasks.test {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "11"
-        javaParameters = true // -opt-in=kotlin.RequiresOptIn
-        // freeCompilerArgs = freeCompilerArgs + listOf("-opt-in=kotlin.RequiresOptIn")
+        javaParameters = true
+        // -opt-in=kotlin.RequiresOptIn
+        // -Xopt-in=kotlin.RequiresOptIn
+        freeCompilerArgs = freeCompilerArgs + listOf("-Xopt-in=kotlin.RequiresOptIn")
     }
 }
 
@@ -70,7 +72,11 @@ tasks.withType<KotlinCompile> {
 compose.desktop {
     application {
         mainClass = "love.forte.simbot.mlh.MainKt"
-        //jvmArgs += listOf("-Xmx2G")
+        jvmArgs += listOf(
+            "-XX:ErrorFile=./.log/hs_err.log",
+            "-XX:-HeapDumpOnOutOfMemoryError",
+            "-XX:HeapDumpPath=./.log/dump.hprof",
+        )
         nativeDistributions {
             targetFormats(
                 TargetFormat.Dmg,
@@ -78,28 +84,31 @@ compose.desktop {
                 TargetFormat.Exe
             )
 
-            //licenseFile.set(project.file("COPYING"))
-            description = "simbot下用于进行mirai登录验证的辅助工具"
-            packageName = "simbot-mirai-login-helper"
-            //packageVersion = project.version.toString()
-            //copyright = "© 2022 ForteScarlet. All rights reserved."
+
+            //modules("javax.naming")
+
+            licenseFile.set(project.file("_COPYING.MERGE"))
+            // description = "simbot下用于进行mirai登录验证的辅助工具"
+            packageName = "simbotMiraiLoginHelper"
+            packageVersion = project.version.toString()
+            copyright = "(C) 2022 ForteScarlet. All rights reserved."
 
 
             macOS {
                 this.iconFile.set(project.file("icon.icns"))
             }
 
-            linux {
-                this.iconFile.set(project.file("icon.png"))
-                shortcut = true
-                //debMaintainer = "ForteScarlet@163.com"
-                //menuGroup = "simbot"
-            }
             windows {
                 this.iconFile.set(project.file("icon.ico"))
                 shortcut = true
-                //menuGroup = "simbot"
-                //upgradeUuid = "SIMBOT7d1cbMIRAILOGINHELPER42ba4f63d8f9"
+                menuGroup = "simbot"
+            }
+
+            linux {
+                this.iconFile.set(project.file("icon.png"))
+                shortcut = true
+                debMaintainer = "ForteScarlet@163.com"
+                menuGroup = "simbot"
             }
 
 

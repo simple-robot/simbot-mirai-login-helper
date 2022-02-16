@@ -13,8 +13,6 @@ import love.forte.simbot.mlh.window.Home
 import love.forte.simbot.mlh.window.Logo
 import love.forte.simbot.mlh.window.SetStep
 import love.forte.simbot.mlh.window.Step
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 typealias SetTitle = (String?) -> Unit
 
@@ -41,10 +39,9 @@ fun FrameWindowScope.App(resetTitle: SetTitle, exit: () -> Unit) {
 
 }
 
-@Suppress("unused")
-val globalLogger: Logger = LoggerFactory.getLogger("simbot.mirai.login.helper.main")
 
 fun main() = application {
+    //LoggerFactory.getLogger("simbot.mirai.login.helper.main")
     val default = "simbot-mirai登录工具"
     var title by remember { mutableStateOf(default) }
     MaterialTheme {
