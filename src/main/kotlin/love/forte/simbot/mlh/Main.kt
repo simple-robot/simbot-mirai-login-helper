@@ -1,57 +1,65 @@
 package love.forte.simbot.mlh
 
-import io.github.bonigarcia.wdm.WebDriverManager
-import net.lightbody.bmp.BrowserMobProxy
-import net.lightbody.bmp.BrowserMobProxyServer
-import net.lightbody.bmp.client.ClientUtil
-import net.lightbody.bmp.proxy.CaptureType
-import net.mamoe.mirai.utils.LoggerAdapters
-import org.openqa.selenium.Proxy
-import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.remote.CapabilityType
-import org.openqa.selenium.remote.DesiredCapabilities
+
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.*
+import androidx.compose.ui.window.FrameWindowScope
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import love.forte.simbot.mlh.window.Home
+import love.forte.simbot.mlh.window.Logo
+import love.forte.simbot.mlh.window.SetStep
+import love.forte.simbot.mlh.window.Step
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+
+typealias SetTitle = (String?) -> Unit
+
+@OptIn(ExperimentalAnimationApi::class)
+@Suppress("FunctionName")
+@Composable
+@Preview
+fun FrameWindowScope.App(resetTitle: SetTitle, exit: () -> Unit) {
+
+    var step by remember { mutableStateOf<Step?>(null) }
 
 
-suspend fun main(args: Array<String>) {
-    LoggerAdapters.useLog4j2()
+    val setStep: SetStep = { step = it }
 
-    // https://www.selenium.dev/zh-cn/documentation/webdriver/getting_started/open_browser/
-
-    // start the proxy
-    val proxy: BrowserMobProxy = BrowserMobProxyServer()
-    proxy.start()
-
-    // get the Selenium proxy object
-    val seleniumProxy: Proxy = ClientUtil.createSeleniumProxy(proxy)
-
-    // configure it as a desired capability
-    val capabilities = DesiredCapabilities()
-    capabilities.setCapability(CapabilityType.PROXY, seleniumProxy)
-
-
-    val driverManager = WebDriverManager.chromedriver()
-    driverManager.setup()
-
-    val options = ChromeOptions().merge(capabilities)
-
-    // enable more detailed HAR capture, if desired (see CaptureType for the complete list)
-    // proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT)
-    proxy.enableHarCaptureTypes(CaptureType.getResponseCaptureTypes())
-
-    // val solver = SeleniumLoginSolver(proxy) {
-    //     ChromeDriver(options)
-    // }
-    //
-    // val bot = BotFactory.newBot(1462974621, "123456789") {
-    //     loginSolver = solver
-    //     deviceInfo = { bot -> simbotMiraiDeviceInfo(bot.id, 1) }
-    // }
-
-
-    // val bot = botManager.register(3521361891, "LiChengYang9983.") {
-    //     loginSolver = solver
-    //     deviceInfo = { bot -> simbotMiraiDeviceInfo(bot.id, 1) }
-    // }
-    // bot.login()
+    AnimatedContent(
+        targetState = step
+    ) { target ->
+        if (target == null) {
+            Home(resetTitle, setStep, exit)
+        } else {
+            target.doContent(this@App, resetTitle, setStep)
+        }
+    }
 
 }
+
+@Suppress("unused")
+val globalLogger: Logger = LoggerFactory.getLogger("simbot.mirai.login.helper.main")
+
+fun main() = application {
+    val default = "simbot-mirai登录工具"
+    var title by remember { mutableStateOf(default) }
+    MaterialTheme {
+        Window(
+            onCloseRequest = ::exitApplication,
+            title = title,
+            icon = Logo.painter
+        ) {
+            App(
+                { title = it ?: default },
+            ) {
+                exitApplication()
+            }
+        }
+    }
+}
+
+

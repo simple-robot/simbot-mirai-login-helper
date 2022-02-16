@@ -40,7 +40,7 @@ class SeleniumLoginSolver(
         ignoreUnknownKeys = true
 
     }
-    private val driver: WebDriver = driverGetter()
+    private val driver: WebDriver by lazy { driverGetter() }
 
     fun quit() {
         driver.quit()

@@ -50,7 +50,7 @@ fun FrameWindowScope.installCer(setStep: SetStep) {
             Button(modifier = Modifier.align(Alignment.CenterHorizontally), onClick = {
                 showTipWindow = !showTipWindow
             }) {
-                Text("查看说明")
+                Text("证书说明")
             }
 
             // 提示窗口

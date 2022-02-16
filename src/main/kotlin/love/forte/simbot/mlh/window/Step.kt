@@ -2,6 +2,7 @@ package love.forte.simbot.mlh.window
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.window.FrameWindowScope
+import love.forte.simbot.mlh.SetTitle
 
 typealias SetStep = (Step?) -> Unit
 
@@ -23,6 +24,10 @@ enum class Step(
      */
     LOGIN_BOT("登录验证BOT", { _, setTitle, setStep -> loginBot(setTitle, setStep) }),
 
+    /**
+     * 3 查看说明
+     */
+    TIPS("查看说明", { _, setTitle, setStep -> loginBot(setTitle, setStep) }),
 
     ;
 

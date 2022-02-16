@@ -27,6 +27,7 @@ import androidx.compose.ui.window.WindowScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import love.forte.simbot.mlh.SetTitle
 import java.awt.Desktop
 import java.net.URI
 

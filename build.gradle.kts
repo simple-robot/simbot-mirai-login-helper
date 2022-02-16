@@ -69,7 +69,7 @@ tasks.withType<KotlinCompile> {
 
 compose.desktop {
     application {
-        mainClass = "love.forte.simbot.mlh.window.WindowMainKt"
+        mainClass = "love.forte.simbot.mlh.MainKt"
         //jvmArgs += listOf("-Xmx2G")
         nativeDistributions {
             targetFormats(
@@ -78,18 +78,20 @@ compose.desktop {
                 TargetFormat.Exe
             )
 
+            licenseFile.set(project.file("COPYING"))
+
 
 
             description = "simbot下mirai组件首次设备登录辅助工具"
-            packageName = "simbot-mirai-login-helper"
-            packageVersion = "1.0.0"
+            packageName = "simbot_mirai_login_helper"
+            packageVersion = project.version.toString()
+
 
             macOS {
                 this.iconFile.set(project.file("icon.icns"))
-                notarization {
-                    this.ascProvider
-                }
+
             }
+
             linux {
                 this.iconFile.set(project.file("icon.png"))
                 shortcut = true

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import love.forte.simbot.mlh.SetTitle
 import love.forte.simbot.mlh.WebDriverType
 import love.forte.simbot.utils.runWithInterruptible
 import java.io.File

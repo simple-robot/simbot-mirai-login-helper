@@ -113,8 +113,6 @@ fun runLoginBot(state: RunLoginBotState) {
                         }
 
                         if (state.solver != null) {
-                            Text(text = "solver: ${state.solver}")
-
                             // 准备登录
                             doLogin(remember { DoLoginState(state) })
                         }
