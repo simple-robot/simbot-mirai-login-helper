@@ -49,8 +49,8 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.17.1")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.17.1")
 
-    testImplementation(kotlin("test"))
-    implementation(compose.desktop.common)
+    //testImplementation(kotlin("test"))
+    //implementation(compose.desktop.common)
     implementation(compose.desktop.currentOs)
 }
 
@@ -78,27 +78,28 @@ compose.desktop {
                 TargetFormat.Exe
             )
 
-            licenseFile.set(project.file("COPYING"))
-
-
-
-            description = "simbot下mirai组件首次设备登录辅助工具"
-            packageName = "simbot_mirai_login_helper"
-            packageVersion = project.version.toString()
+            //licenseFile.set(project.file("COPYING"))
+            description = "simbot下用于进行mirai登录验证的辅助工具"
+            packageName = "simbot-mirai-login-helper"
+            //packageVersion = project.version.toString()
+            //copyright = "© 2022 ForteScarlet. All rights reserved."
 
 
             macOS {
                 this.iconFile.set(project.file("icon.icns"))
-
             }
 
             linux {
                 this.iconFile.set(project.file("icon.png"))
                 shortcut = true
+                //debMaintainer = "ForteScarlet@163.com"
+                //menuGroup = "simbot"
             }
             windows {
                 this.iconFile.set(project.file("icon.ico"))
                 shortcut = true
+                //menuGroup = "simbot"
+                //upgradeUuid = "SIMBOT7d1cbMIRAILOGINHELPER42ba4f63d8f9"
             }
 
 

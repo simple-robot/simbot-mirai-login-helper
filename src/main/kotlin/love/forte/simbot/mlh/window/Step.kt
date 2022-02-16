@@ -27,7 +27,7 @@ enum class Step(
     /**
      * 3 查看说明
      */
-    TIPS("查看说明", { _, setTitle, setStep -> loginBot(setTitle, setStep) }),
+    TIPS("查看说明", { _, setTitle, setStep -> theTips(setTitle, setStep) }),
 
     ;
 
