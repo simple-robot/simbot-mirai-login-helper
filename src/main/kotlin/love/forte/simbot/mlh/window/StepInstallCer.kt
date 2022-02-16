@@ -6,7 +6,6 @@ import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.OutlinedButton
@@ -140,10 +139,7 @@ fun tipWindow(onClose: () -> Unit) {
                 Modifier.padding(start = 40.dp, end = 40.dp, top = 10.dp, bottom = 10.dp)
                     .verticalScroll(state = verColl, flingBehavior = ScrollableDefaults.flingBehavior())
             ) {
-                val text = "长篇大论".repeat(500)
-                SelectionContainer {
-                    Text(text)
-                }
+                Column { tip() }
             }
 
             VerticalScrollbar(
