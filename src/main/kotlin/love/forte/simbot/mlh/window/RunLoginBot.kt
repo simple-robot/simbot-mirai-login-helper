@@ -91,7 +91,7 @@ fun runLoginBot(state: RunLoginBotState) {
                 modifier = Modifier.verticalScroll(
                     state = scrollState,
                     flingBehavior = flingBehavior(),
-                )
+                ).padding(40.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(10.dp),

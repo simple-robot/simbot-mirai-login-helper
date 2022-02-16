@@ -23,6 +23,8 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.awt.Desktop
@@ -39,7 +41,7 @@ val CenterModifier = Modifier
  */
 @Preview
 @Composable
-fun Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
+fun WindowScope.Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
     val onExitButtonInteractionSource = MutableInteractionSource()
     var onExitButton by remember { mutableStateOf(false) }
     val brushColorA by animateColorAsState(if (onExitButton) Color.Red else Color.Green)
@@ -58,36 +60,36 @@ fun Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
 
     setTitle(null)
 
-    Box(
-        modifier = CenterModifier
+    BoxWithConstraints(
+        modifier = CenterModifier//.background(Color.Red)
     ) {
-        Column {
-            // logo
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Box(
                 modifier = Modifier
-                    .height(170.dp)
-                    .width(170.dp)
-                    .align(Alignment.CenterHorizontally)
-                // .padding(bottom = 30.dp)
+                    .size((this@BoxWithConstraints.maxWidth * 0.2F))
             ) {
                 logo()
             }
 
-            Step.values().forEach { step ->
-                StepButton(setTitle, step, resetStep)
+            Step.values().forEachIndexed { i, step ->
+                this@BoxWithConstraints.StepButton(setTitle, step, resetStep, (i + 1) * 120L)
             }
 
 
             Row(
                 modifier = Modifier
+                    .fillMaxWidth().padding(top = 30.dp, bottom = 25.dp, start = 50.dp, end = 50.dp)
                     .align(Alignment.CenterHorizontally)
-                    .absolutePadding(top = 15.dp, bottom = 15.dp)
+                // .absolutePadding(top = 15.dp, bottom = 15.dp)
             ) {
                 // 水平线
                 Spacer(
                     Modifier.background(Color.LightGray)
                         .height(1.dp)
-                        .fillMaxWidth(0.7F)
+                        .fillMaxWidth()
 
                 )
             }
@@ -95,7 +97,7 @@ fun Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
 
             OutlinedButton(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    //.width(this@BoxWithConstraints.maxWidth * 0.2F)
                     .wrapContentWidth(Alignment.CenterHorizontally)
                     .hoverable(interactionSource = remember { onExitButtonInteractionSource }),
                 onClick = {
@@ -148,7 +150,6 @@ private val exitAnimates: List<() -> ExitTransition> = listOf(
     }
     newList
 }
-
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -231,16 +232,33 @@ private fun BoxScope.logo() {
 
 
 @Composable
-private fun StepButton(setTitle: SetTitle, step: Step, resetStep: SetStep) {
-    Button(
-        modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentWidth(Alignment.CenterHorizontally),
-        onClick = {
-            setTitle("${step.ordinal + 1}: ${step.display}")
-            resetStep(step)
+private fun BoxWithConstraintsScope.StepButton(setTitle: SetTitle, step: Step, resetStep: SetStep, delayTime: Long) {
+    val showState = remember {
+        MutableTransitionState(false).apply {
+            // Start the animation immediately.
+            // targetState = true
         }
+    }
+
+    LaunchedEffect(Unit) {
+        delay(delayTime)
+        showState.targetState = true
+    }
+
+    AnimatedVisibility(
+        visibleState = showState,
+        enter = entryAnimates.random()(),
+        exit = exitAnimates.random()(),
     ) {
-        Text("${step.ordinal + 1}: ${step.display}")
+        Button(
+            modifier = Modifier
+                .width(maxWidth * 0.2f),
+            onClick = {
+                setTitle("${step.ordinal + 1}: ${step.display}")
+                resetStep(step)
+            }
+        ) {
+            Text("${step.ordinal + 1}: ${step.display}")
+        }
     }
 }
