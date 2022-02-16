@@ -5,10 +5,8 @@ import net.lightbody.bmp.BrowserMobProxy
 import net.lightbody.bmp.BrowserMobProxyServer
 import net.lightbody.bmp.client.ClientUtil
 import net.lightbody.bmp.proxy.CaptureType
-import net.mamoe.mirai.BotFactory
 import net.mamoe.mirai.utils.LoggerAdapters
 import org.openqa.selenium.Proxy
-import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
@@ -40,20 +38,20 @@ suspend fun main(args: Array<String>) {
     // proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT)
     proxy.enableHarCaptureTypes(CaptureType.getResponseCaptureTypes())
 
-    val solver = SeleniumLoginSolver(proxy) {
-        ChromeDriver(options)
-    }
-
-    val bot = BotFactory.newBot(1462974621, "123456789") {
-        loginSolver = solver
-        deviceInfo = { bot -> simbotMiraiDeviceInfo(bot.id, 1) }
-    }
+    // val solver = SeleniumLoginSolver(proxy) {
+    //     ChromeDriver(options)
+    // }
+    //
+    // val bot = BotFactory.newBot(1462974621, "123456789") {
+    //     loginSolver = solver
+    //     deviceInfo = { bot -> simbotMiraiDeviceInfo(bot.id, 1) }
+    // }
 
 
     // val bot = botManager.register(3521361891, "LiChengYang9983.") {
     //     loginSolver = solver
     //     deviceInfo = { bot -> simbotMiraiDeviceInfo(bot.id, 1) }
     // }
-    bot.login()
+    // bot.login()
 
 }

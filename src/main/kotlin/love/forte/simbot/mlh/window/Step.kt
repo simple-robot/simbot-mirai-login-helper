@@ -9,7 +9,8 @@ typealias SetStep = (Step?) -> Unit
  * 进行的步骤，也是可选的内容选项
  */
 enum class Step(
-    val display: String, private val content: (@Composable (frameWindowScope: FrameWindowScope, setTitle: SetTitle, setStep: SetStep) -> Unit)
+    val display: String,
+    private val content: (@Composable (frameWindowScope: FrameWindowScope, setTitle: SetTitle, setStep: SetStep) -> Unit)
 ) {
 
     /**

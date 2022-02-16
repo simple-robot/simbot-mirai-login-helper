@@ -2,7 +2,8 @@
 
 package love.forte.simbot.mlh.window
 
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.*
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,7 +12,6 @@ import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.awt.Desktop
-import java.io.File
 import java.net.URI
 
 val CenterModifier = Modifier
@@ -45,7 +44,6 @@ fun Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
     var onExitButton by remember { mutableStateOf(false) }
     val brushColorA by animateColorAsState(if (onExitButton) Color.Red else Color.Green)
 
-    Text(File(".cache").absolutePath)
 
     LaunchedEffect(Unit) {
         onExitButtonInteractionSource.interactions
@@ -59,6 +57,7 @@ fun Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
     }
 
     setTitle(null)
+
     Box(
         modifier = CenterModifier
     ) {
@@ -113,12 +112,59 @@ fun Home(setTitle: SetTitle, resetStep: SetStep, exit: () -> Unit) {
     }
 }
 
+
+@OptIn(ExperimentalAnimationApi::class)
+private val entryAnimates: List<() -> EnterTransition> = listOf(
+    { fadeIn() },
+    { scaleIn() },
+    { expandIn() },
+    { expandHorizontally() },
+    { expandVertically() },
+).let { list ->
+    val newList = list.toMutableList()
+    // 2*2交叉合并
+    for (i in list.indices) {
+        for (j in (i + 1) until list.size) {
+            newList.add { list[i]() + list[j]() }
+        }
+    }
+    newList
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+private val exitAnimates: List<() -> ExitTransition> = listOf(
+    { fadeOut() },
+    { scaleOut() },
+    { shrinkOut() },
+    { shrinkHorizontally() },
+    { shrinkVertically() },
+).let { list ->
+    val newList = list.toMutableList()
+    // 2*2交叉合并
+    for (i in list.indices) {
+        for (j in (i + 1) until list.size) {
+            newList.add { list[i]() + list[j]() }
+        }
+    }
+    newList
+}
+
+
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun logo() {
+private fun BoxScope.logo() {
+    val logoShowState = remember {
+        MutableTransitionState(false).apply {
+            // Start the animation immediately.
+            targetState = true
+        }
+    }
     var showNoDesktopWarn by remember { mutableStateOf(false) }
-    Surface(
-        shape = RoundedCornerShape(500.dp)
+    AnimatedVisibility(
+        visibleState = logoShowState,
+        enter = entryAnimates.random()(),
+        exit = exitAnimates.random()(),
     ) {
         Image(
             bitmap = Logo.logoBitmap,
@@ -127,6 +173,7 @@ private fun logo() {
                 .wrapContentWidth(Alignment.CenterHorizontally)
                 .wrapContentHeight(Alignment.CenterVertically)
                 .fillMaxSize()
+                .padding(15.dp)
                 .clickable(
                     onClickLabel = "simbot",
                     role = Role.Image,

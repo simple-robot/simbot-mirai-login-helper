@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.5.31"
+    kotlin("plugin.serialization") version "1.5.31"
     id("org.jetbrains.compose") version "1.0.0"
 }
 
@@ -36,7 +37,9 @@ dependencies {
     // implementation("org.littleshoot:littleproxy:1.1.2")
     // implementation("net.lightbody.bmp:mitm:2.1.5")
 
-
+    // qrcode
+    implementation("com.google.zxing:core:3.4.1")
+    implementation("com.google.zxing:javase:3.4.1")
     // simbot3-mirai
     implementation("love.forte.simbot.component:simbot-component-mirai-core:3.0.0.preview.3.0-292.0.1")
     implementation("love.forte.simbot.component:simbot-component-mirai-boot:3.0.0.preview.3.0-292.0.1")
@@ -58,8 +61,8 @@ tasks.test {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         jvmTarget = "11"
-        javaParameters = true
-        //freeCompilerArgs = freeCompilerArgs + listOf("-opt-in=kotlin.RequiresOptIn")
+        javaParameters = true // -opt-in=kotlin.RequiresOptIn
+        // freeCompilerArgs = freeCompilerArgs + listOf("-opt-in=kotlin.RequiresOptIn")
     }
 }
 
@@ -80,8 +83,12 @@ compose.desktop {
             description = "simbot下mirai组件首次设备登录辅助工具"
             packageName = "simbot-mirai-login-helper"
             packageVersion = "1.0.0"
+
             macOS {
                 this.iconFile.set(project.file("icon.icns"))
+                notarization {
+                    this.ascProvider
+                }
             }
             linux {
                 this.iconFile.set(project.file("icon.png"))

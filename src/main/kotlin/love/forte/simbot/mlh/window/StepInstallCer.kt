@@ -37,6 +37,7 @@ fun FrameWindowScope.installCer(setStep: SetStep) {
         saveCerWindow(scope)
     }
 
+
     Box(
         modifier = Modifier.fillMaxSize().padding(20.dp).wrapContentHeight(Alignment.Top)
             .wrapContentWidth(Alignment.CenterHorizontally),
@@ -132,6 +133,7 @@ fun tipWindow(onClose: () -> Unit) {
     Window(
         onCloseRequest = onClose,
         title = "证书说明",
+        icon = Logo.painter,
     ) {
         Box {
             Box(

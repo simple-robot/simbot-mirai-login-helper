@@ -3,6 +3,7 @@ package love.forte.simbot.mlh
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.serialization.json.Json
 import net.lightbody.bmp.BrowserMobProxy
 import net.mamoe.mirai.Bot
 import net.mamoe.mirai.network.CustomLoginFailedException
@@ -11,7 +12,8 @@ import net.mamoe.mirai.utils.BotConfiguration
 import net.mamoe.mirai.utils.LoginSolver
 import org.openqa.selenium.WebDriver
 import org.slf4j.LoggerFactory
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicReference
+import kotlin.coroutines.resume
 
 /**
  *
@@ -19,10 +21,34 @@ import java.util.concurrent.ConcurrentHashMap
  */
 class SeleniumLoginSolver(
     proxy: BrowserMobProxy,
-    driverGetter: () -> WebDriver
+    private val onSolvePicCaptcha: suspend (bot: Bot, data: ByteArray) -> String? = { bot, data ->
+        val defaultSolver = BotConfiguration.Default.loginSolver ?: throw ICustomLoginFailedException(true)
+        defaultSolver.onSolvePicCaptcha(bot, data)
+    },
+
+    driverGetter: () -> WebDriver,
+
+    private val onSolveUnsafeDeviceLoginVerify: suspend (bot: Bot, url: String) -> String? = { bot, url ->
+        val defaultSolver = BotConfiguration.Default.loginSolver ?: throw ICustomLoginFailedException(true)
+        defaultSolver.onSolveUnsafeDeviceLoginVerify(bot, url)
+    }
+
 ) : LoginSolver() {
 
+    private val json = Json {
+        isLenient = true
+        ignoreUnknownKeys = true
+
+    }
     private val driver: WebDriver = driverGetter()
+
+    fun quit() {
+        driver.quit()
+    }
+
+    fun close() {
+        driver.close()
+    }
 
     private val logger =
         LoggerFactory.getLogger("love.forte.simbot.mirai-login-helper.mlh.SeleniumLoginSolver")
@@ -30,13 +56,24 @@ class SeleniumLoginSolver(
     override val isSliderCaptchaSupported: Boolean
         get() = true
 
-    private val sliderCaptchaWaiting = ConcurrentHashMap<String, CancellableContinuation<*>>()
+    private val sliderCaptchaWaiting = AtomicReference<CancellableContinuation<String>>(null)
 
     init {
 
-        proxy.addResponseFilter { response, contents, messageInfo ->
+        proxy.addResponseFilter { _, contents, messageInfo ->
             if ("https://t.captcha.qq.com/cap_union_new_verify" in messageInfo.originalUrl) {
-                println("response text: ${contents.textContents}")
+                val textContents = contents.textContents
+                logger.info("response text: $textContents")
+                val resp = json.decodeFromString(SolveSliderCaptchaResponse.serializer(), textContents)
+                sliderCaptchaWaiting.updateAndGet { curr ->
+                    if (curr != null) {
+                        if ("0" == resp.errorCode && (resp.ticket?.isNotEmpty() == true)) {
+                            curr.resume(resp.ticket)
+                            return@updateAndGet null
+                        }
+                    }
+                    curr
+                }
             }
         }
     }
@@ -50,6 +87,7 @@ class SeleniumLoginSolver(
      * @throws LoginFailedException
      */
     override suspend fun onSolvePicCaptcha(bot: Bot, data: ByteArray): String? {
+        println("图片验证码！")
         val loginSolver = BotConfiguration.Default.loginSolver ?: throw ICustomLoginFailedException(true)
         return loginSolver.onSolvePicCaptcha(bot, data)
     }
@@ -70,12 +108,13 @@ class SeleniumLoginSolver(
     override suspend fun onSolveSliderCaptcha(bot: Bot, url: String): String? =
         suspendCancellableCoroutine { continuation ->
             logger.info("OnSolveSliderCaptcha URL: {}", url)
-
+            sliderCaptchaWaiting.updateAndGet { old ->
+                old?.cancel()
+                continuation
+            }
             bot.launch {
-
                 // open driver
                 driver.get(url)
-
                 /*
                     Request URL: https://t.captcha.qq.com/cap_union_new_verify
                     {
@@ -101,8 +140,9 @@ class SeleniumLoginSolver(
      * @throws LoginFailedException
      */
     override suspend fun onSolveUnsafeDeviceLoginVerify(bot: Bot, url: String): String? {
-        val loginSolver = BotConfiguration.Default.loginSolver ?: throw ICustomLoginFailedException(true)
-        return loginSolver.onSolveUnsafeDeviceLoginVerify(bot, url)
+        return onSolveUnsafeDeviceLoginVerify.invoke(bot, url)
+        // val loginSolver = BotConfiguration.Default.loginSolver ?: throw ICustomLoginFailedException(true)
+        // return loginSolver.onSolveUnsafeDeviceLoginVerify(bot, url)
 
     }
     // suspendCancellableCoroutine { continuation ->
@@ -119,6 +159,7 @@ class ICustomLoginFailedException : CustomLoginFailedException {
     constructor(killBot: Boolean, cause: Throwable?) : super(killBot, cause)
 }
 
+@kotlinx.serialization.Serializable
 private data class SolveSliderCaptchaResponse(
     val errorCode: String? = null,
     val randstr: String? = null,

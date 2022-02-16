@@ -9,6 +9,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +21,12 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 import love.forte.simbot.mlh.WebDriverType
+import love.forte.simbot.utils.runWithInterruptible
+import java.io.File
 
 /**
  * 登录bot并根据操作进行
@@ -27,6 +35,8 @@ import love.forte.simbot.mlh.WebDriverType
 @Preview
 @Composable
 fun loginBot(setTitle: SetTitle, setStep: SetStep) {
+    val scope = rememberCoroutineScope()
+    var cacheRead by remember { mutableStateOf(false) }
     val verticalScrollState = rememberScrollState(0)
     var selectedDriver: WebDriverType? by remember { mutableStateOf(null) }
     var code by remember { mutableStateOf("") }
@@ -36,7 +46,17 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
     var onLoginBot by remember { mutableStateOf(false) }
     var warningMessage: String? by remember { mutableStateOf(null) }
 
-
+    if (!cacheRead && code.isEmpty() || selectedDriver == null) {
+        LaunchedEffect(Unit) {
+            runWithInterruptible(Dispatchers.IO) {
+                readCache()?.also { i ->
+                    code = i.code
+                    selectedDriver = i.driverType
+                }
+            }
+            cacheRead = true
+        }
+    }
 
     Box {
         Box(
@@ -53,14 +73,14 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
                     inputInfo(
                         code, codeErr,
                         {
-                            code = it
+                            code = it.trim().filter(Char::isDigit)
                             if (pass.isNotEmpty()) {
                                 codeErr = false
                             }
                         },
                         pass, passErr,
                         {
-                            pass = it
+                            pass = it.trim()
                             if (pass.isNotEmpty()) {
                                 passErr = false
                             }
@@ -83,7 +103,16 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
                                         warningMessage = "密码不可为空"
                                         passErr = true
                                     }
+                                    selectedDriver == null -> {
+                                        warningMessage = "请选择浏览器驱动"
+                                    }
                                     else -> {
+                                        scope.launch {
+                                            runWithInterruptible(Dispatchers.IO) {
+                                                saveCache(CacheInfo(code, selectedDriver))
+                                                cacheRead = false
+                                            }
+                                        }
                                         onLoginBot = true
                                     }
                                 }
@@ -127,9 +156,7 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
 
                     AnimatedVisibility(onLoginBot) {
                         @Suppress("RemoveSingleExpressionStringTemplate")
-                        runLoginBot(code, pass, selectedDriver!!) {
-                            onLoginBot = false
-                        }
+                        runLoginBot(remember { RunLoginBotState(code, pass, selectedDriver!!) { onLoginBot = false } })
                     }
                 }
             }
@@ -143,6 +170,35 @@ fun loginBot(setTitle: SetTitle, setStep: SetStep) {
     }
 
 }
+
+@kotlinx.serialization.Serializable
+private data class CacheInfo(val code: String, val driverType: WebDriverType?)
+
+private val json = Json {
+    isLenient = true
+    ignoreUnknownKeys = true
+}
+
+private fun readCache(): CacheInfo? {
+    val file = File(".cache/last")
+    return runCatching {
+        if (file.exists()) {
+            json.decodeFromString(CacheInfo.serializer(), file.readText())
+        } else null
+    }.getOrNull()
+}
+
+private fun saveCache(info: CacheInfo) {
+    val file = File(".cache/last")
+    runCatching {
+        if (!file.exists()) {
+            file.createNewFile()
+        }
+        val infoStr = json.encodeToString(CacheInfo.serializer(), info)
+        file.writeText(infoStr)
+    }
+}
+
 
 /**
  * 账号信息输入
@@ -165,7 +221,14 @@ fun inputInfo(
                 isError = codeErr,
                 onValueChange = { setCode(it) },
                 label = { Text("账号") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = "Account",
+                    )
+                },
                 placeholder = { Text("请输入账号") },
+
 
                 )
             OutlinedTextField(
@@ -173,6 +236,12 @@ fun inputInfo(
                 isError = passErr,
                 onValueChange = { setPass(it) },
                 label = { Text("密码") },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Lock,
+                        contentDescription = "Password",
+                    )
+                },
                 visualTransformation = PasswordVisualTransformation(),
                 placeholder = { Text("请输入密码") }
             )
