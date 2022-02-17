@@ -69,7 +69,6 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-
 compose.desktop {
     application {
         mainClass = "love.forte.simbot.mlh.MainKt"
@@ -117,3 +116,62 @@ compose.desktop {
         }
     }
 }
+
+// internal val outputs =
+
+tasks.register("packageAndCopy") {
+    group = "compose desktop"
+    dependsOn("package")
+    doLast("packageAndCopyDoLast") {
+        val nativeDistributions = compose.desktop.application.nativeDistributions
+
+        val outputBaseDir = nativeDistributions.outputBaseDir
+        val outputMain = outputBaseDir.dir("main").orNull
+            ?: throw NullPointerException("No outputDir: $outputBaseDir/main")
+
+        val newOutputDir = outputMain.dir("distributions")
+        newOutputDir.asFile.mkdirs()
+
+        println("outputMain: $outputMain")
+
+        nativeDistributions.targetFormats
+            .forEach { targetOsExtension ->
+                val targetOsExtensionName = targetOsExtension.name.toLowerCase()
+                val currentFile = outputMain.files(targetOsExtensionName)
+                    .asFileTree
+                    .filter { it.extension == targetOsExtensionName }
+                    .firstOrNull()
+                    ?.takeIf { it.exists() }
+                    ?: return@forEach
+
+                // 应该就只有一个
+
+                val packageName = nativeDistributions.packageName
+                val packageVersion = nativeDistributions.packageVersion ?: project.version
+
+                val os = when (targetOsExtension) {
+                    TargetFormat.Deb -> "linux"
+                    TargetFormat.Rpm -> "linux"
+                    TargetFormat.Dmg -> "macOS"
+                    TargetFormat.Pkg -> "macOS"
+                    TargetFormat.Exe -> "windows"
+                    TargetFormat.Msi -> "windows"
+                    else -> "unknown"
+                }
+
+                val newFileName = "$packageName-$os-$packageVersion.$targetOsExtensionName"
+                val newFile = newOutputDir.file(newFileName).asFile
+                newFile.createNewFile()
+
+                currentFile.copyTo(target = newFile, overwrite = true)
+            }
+
+        /*
+            Deb
+            Dmg
+            Exe
+         */
+
+    }
+}
+
