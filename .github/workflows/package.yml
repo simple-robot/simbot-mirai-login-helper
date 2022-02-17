@@ -37,12 +37,14 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.3.3
-          arguments: package
+          arguments: packageAndMove
 
-      - if: 1 == 1
-        name: Upload a Build Artifact
+      - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
         with:
-          name: abc
+          name: distributions
+          path: build/compose/binaries/main/distributions/**
+
+
 
 

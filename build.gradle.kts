@@ -119,10 +119,10 @@ compose.desktop {
 
 // internal val outputs =
 
-tasks.register("packageAndCopy") {
+tasks.register("packageAndMove") {
     group = "compose desktop"
     dependsOn("package")
-    doLast("packageAndCopyDoLast") {
+    doLast("packageAndMoveDoLast") {
         val nativeDistributions = compose.desktop.application.nativeDistributions
 
         val outputBaseDir = nativeDistributions.outputBaseDir
@@ -164,6 +164,8 @@ tasks.register("packageAndCopy") {
                 newFile.createNewFile()
 
                 currentFile.copyTo(target = newFile, overwrite = true)
+
+                // copy App?
             }
 
         /*
