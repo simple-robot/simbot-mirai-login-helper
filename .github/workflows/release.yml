@@ -1,10 +1,11 @@
 # native package workflows
-name: build native distribution
-on: push
-#  release:
-#    types:
-#      # https://docs.github.com/cn/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
-#      - published
+name: build and release native distribution
+on:
+  push:
+    tags:
+      - v*.*.**
+
+
 jobs:
   package:
     name: Building native distribution
@@ -13,10 +14,10 @@ jobs:
         os: [ macos-latest, ubuntu-latest, windows-latest ]
     runs-on: ${{ matrix.os }}
 
-    steps:
-      - name: echo OS
-        run: echo ${{ matrix.os }}
+    permissions:
+      contents: write
 
+    steps:
       # 检出仓库代码
       - name: Check out repo
         uses: actions/checkout@v2
@@ -37,13 +38,22 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.3.3
-          arguments: packageAndMove
+          arguments: build packageAndMove
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.3.1
         with:
           name: distributions
           path: build/compose/binaries/main/distributions/**
+
+      # Releases.
+      - name: Create github releases
+        uses: softprops/action-gh-release@v0.1.14
+        with:
+          files: build/compose/binaries/main/distributions/**
+          draft: true
+          generate_release_notes: true
+
 
 
 
