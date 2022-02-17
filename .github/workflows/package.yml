@@ -1,10 +1,10 @@
 # native package workflows
 name: build native distribution
-on:
-  release:
-    types:
-      # https://docs.github.com/cn/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
-      - published
+on: push
+#  release:
+#    types:
+#      # https://docs.github.com/cn/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#release
+#      - published
 jobs:
   package:
     name: Building native distribution
