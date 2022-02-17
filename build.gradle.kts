@@ -9,10 +9,9 @@ plugins {
 }
 
 group = "love.forte.simbot"
-version = "3.0.2"
+version = "3.0.3"
 
 repositories {
-    //mavenLocal()
     mavenCentral()
     google()
 
