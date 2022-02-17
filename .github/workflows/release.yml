@@ -29,6 +29,7 @@ jobs:
           # See 'Supported distributions' for available options
           distribution: 'zulu'
           java-version: '17'
+          cache: 'gradle'
 
       # Gradle
 #      - name: Gradle Wrapper Validation
