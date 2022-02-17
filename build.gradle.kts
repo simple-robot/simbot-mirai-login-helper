@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "love.forte.simbot"
-version = "3.0.4"
+version = "3.0.5"
 
 repositories {
     mavenCentral()
@@ -24,6 +24,9 @@ configurations.all {
         cacheChangingModulesFor(1, "seconds")
     }
 }
+
+val simbotMirai = "3.0.0.preview.3.0-292.0.1-SNAPSHOT"
+
 
 dependencies {
     implementation(kotlin("stdlib"))
@@ -48,9 +51,7 @@ dependencies {
     implementation("com.google.zxing:core:3.4.1")
     implementation("com.google.zxing:javase:3.4.1")
     // simbot3-mirai
-    val simbotMirai = "3.0.0.preview.3.0-292.0.1-SNAPSHOT"
     implementation("love.forte.simbot.component:simbot-component-mirai-core:$simbotMirai")
-    //implementation("love.forte.simbot.component:simbot-component-mirai-boot:3.0.0.preview.3.0-292.0.1")
 
     // log4j2
     implementation("org.apache.logging.log4j:log4j-api:2.17.1")
@@ -86,8 +87,13 @@ compose.desktop {
         )
         nativeDistributions {
             targetFormats(
+                TargetFormat.Rpm,
                 TargetFormat.Deb,
+
+                //TargetFormat.Pkg,
                 TargetFormat.Dmg,
+
+                TargetFormat.Msi,
                 TargetFormat.Exe,
             )
 
@@ -124,7 +130,6 @@ compose.desktop {
     }
 }
 
-// internal val outputs =
 
 tasks.register("packageAndMove") {
     group = "compose desktop"
@@ -184,3 +189,47 @@ tasks.register("packageAndMove") {
     }
 }
 
+
+
+
+tasks.create("createChangelog") {
+    group = "build"
+    doFirst {
+        val version = "v${project.version}"
+        println("Generate change log for $version ...")
+        // configurations.runtimeClasspath
+        val changelogDir = project.file(".changelog").also {
+            it.mkdirs()
+        }
+        val file = File(changelogDir, "$version.md")
+        if (!file.exists()) {
+            file.createNewFile()
+            val autoGenerateText = """
+                simbot-mirai version: `$simbotMirai`
+
+
+
+                ## 其他说明
+                #### 版本号
+                目前版本 `3.x.x` 等同于 `0.x.x`, 请在脑海中自动将版本最前的数字-3。
+                由于 `macOS`(`dmg` & `pkg`) 打包必须保证版本号符合规则: `MAJOR[.MINOR][.PATCH]` 且:
+                - `MAJOR` 是大于0的数字;
+                - `MINOR` 是一个可选的非负整数;
+                - `PATCH` 是一个可选的非负整数;
+                因此对于`dmg`和`pkg`文件来说，不能使用最大版本号小于0的版本。因此选择将 `MAJOR` 数字与当前环境下 `simbot` 对应的 `MAJOR` 一致，也就是 `3`。
+
+                有关于其他文件的版本说明请参考 [compose-jb/tutorials/Building native distribution/Specifying package version](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#specifying-package-version)
+
+                <hr>
+
+
+
+            """.trimIndent()
+
+
+            file.writeText(autoGenerateText)
+        }
+
+
+    }
+}

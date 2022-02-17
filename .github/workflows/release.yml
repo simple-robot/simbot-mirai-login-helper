@@ -52,5 +52,4 @@ jobs:
         with:
           files: build/compose/binaries/main/distributions/**
           body_path: .changelog/${{ github.ref_name }}.md
-          draft: true
           generate_release_notes: true
