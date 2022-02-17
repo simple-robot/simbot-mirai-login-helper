@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "love.forte.simbot"
-version = "3.0.0"
+version = "3.0.1"
 
 repositories {
     google()
@@ -41,7 +41,8 @@ dependencies {
     implementation("com.google.zxing:core:3.4.1")
     implementation("com.google.zxing:javase:3.4.1")
     // simbot3-mirai
-    implementation("love.forte.simbot.component:simbot-component-mirai-core:3.0.0.preview.3.0-292.0.1")
+    val simbotMirai = "3.0.0.preview.3.0-292.0.1-SNAPSHOT"
+    implementation("love.forte.simbot.component:simbot-component-mirai-core:$simbotMirai")
     //implementation("love.forte.simbot.component:simbot-component-mirai-boot:3.0.0.preview.3.0-292.0.1")
 
     // log4j2
@@ -73,18 +74,19 @@ compose.desktop {
     application {
         mainClass = "love.forte.simbot.mlh.MainKt"
         jvmArgs += listOf(
-            "-XX:ErrorFile=./.log/hs_err.log",
+            "-XX:ErrorFile=.log/hs_err.log",
             "-XX:-HeapDumpOnOutOfMemoryError",
-            "-XX:HeapDumpPath=./.log/dump.hprof",
+            "-XX:HeapDumpPath=.log/dump.hprof",
         )
         nativeDistributions {
             targetFormats(
-                TargetFormat.Dmg,
                 TargetFormat.Deb,
-                TargetFormat.Exe
+                TargetFormat.Dmg,
+                TargetFormat.Exe,
             )
 
 
+            // outputBaseDir
             //modules("javax.naming")
 
             licenseFile.set(project.file("_COPYING.MERGE"))

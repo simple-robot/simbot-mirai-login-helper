@@ -32,11 +32,7 @@ fun ColumnScope.tip() {
     )
 
     //region 1.selenium
-    Text(
-        text = "1. selenium",
-        style = MaterialTheme.typography.h5,
-        modifier = Modifier.align(Alignment.CenterHorizontally).padding(5.dp)
-    )
+    subTitle("1. selenium")
 
 
     Row {
@@ -62,11 +58,7 @@ fun ColumnScope.tip() {
     }
     //endregion
 
-    Text(
-        text = "2. webdrivermanager",
-        style = MaterialTheme.typography.h5,
-        modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 30.dp, bottom = 15.dp)
-    )
+    subTitle("2. webdrivermanager")
 
     Row {
         ClickableTextWithLinks {
@@ -74,11 +66,19 @@ fun ColumnScope.tip() {
                 textIndent = TextIndent(firstLine = 40.sp)
             )) {
                 append("ABC")
-
             }
         }
     }
 
 }
 
+@Composable
+private fun subTitle(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.h5,
+        modifier = Modifier.subTitlePadding()
+    )
+}
 
+private fun Modifier.subTitlePadding(): Modifier = padding(top = 30.dp, bottom = 15.dp)
