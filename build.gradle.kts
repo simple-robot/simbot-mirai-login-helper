@@ -12,10 +12,18 @@ group = "love.forte.simbot"
 version = "3.0.1"
 
 repositories {
-    google()
-    mavenLocal()
+    //mavenLocal()
     mavenCentral()
+    google()
+
+    maven("https://oss.sonatype.org/content/repositories/snapshots/")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+}
+
+configurations.all {
+    resolutionStrategy {
+        cacheChangingModulesFor(1, "seconds")
+    }
 }
 
 dependencies {
