@@ -5,6 +5,17 @@
 
 
 
+## 使用
+### 安装
+#### 方案1 - 下载Release
+
+前往 [releases](https://github.com/simple-robot/simbot-mirai-login-helper/releases) 中选择版本并下载对应平台的安装文件。
+下载后在电脑上安装、运行。
+
+#### 方案2 - 自行编译
+自行编译源代码并使用。
+
+
 
 ## 其他说明
 #### 版本号
