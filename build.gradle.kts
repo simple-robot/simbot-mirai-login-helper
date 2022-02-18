@@ -9,7 +9,8 @@ plugins {
 }
 
 group = "love.forte.simbot"
-version = "3.0.5"
+val subVersion = "0.6"
+version = "3.$subVersion"
 
 repositories {
     mavenCentral()
@@ -99,7 +100,7 @@ compose.desktop {
 
 
             // outputBaseDir
-            //modules("javax.naming")
+            modules("java.naming")
 
             licenseFile.set(project.file("_COPYING.MERGE"))
             // description = "simbot下用于进行mirai登录验证的辅助工具"
@@ -211,7 +212,7 @@ tasks.create("createChangelog") {
 
                 ## 其他说明
                 #### 版本号
-                目前版本 `3.x.x` 等同于 `0.x.x`, 请在脑海中自动将版本最前的数字-3。
+                目前版本 `3.$subVersion` 等同于 `0.$subVersion`, 请在脑海中自动将版本最前的数字-3。
                 由于 `macOS`(`dmg` & `pkg`) 打包必须保证版本号符合规则: `MAJOR[.MINOR][.PATCH]` 且:
                 - `MAJOR` 是大于0的数字;
                 - `MINOR` 是一个可选的非负整数;
