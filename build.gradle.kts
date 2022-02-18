@@ -133,9 +133,12 @@ compose.desktop {
 }
 
 
+
 tasks.register("packageAndMove") {
     group = "compose desktop"
-    dependsOn("package")
+
+    dependsOn("package", ) // "createDistributable"
+
     doLast("packageAndMoveDoLast") {
         val nativeDistributions = compose.desktop.application.nativeDistributions
 
@@ -179,11 +182,17 @@ tasks.register("packageAndMove") {
 
                 currentFile.copyTo(target = newFile, overwrite = true)
 
-                //val newZipFileName = "$packageName-$os-$packageVersion.zip"
-                //val zipFile = newOutputDir.file(newZipFileName).asFile
-                //val fileOutputStream = FileOutputStream(zipFile)
-                //// copy App and zip?
-                //val zipOut = ZipOutputStream(fileOutputStream)
+                // val zipFileExtra = when (os) {
+                //     "macOS", "windows" -> "zip"
+                //     else -> "tar"
+                // }
+                //
+                // val newZipFileName = "$packageName-$os-$packageVersion.$zipFileExtra"
+                // val zipFile = newOutputDir.file(newZipFileName).asFile
+                // val fileOutputStream = FileOutputStream(zipFile)
+                // // copy App and zip?
+                // val zipOut = ZipOutputStream(fileOutputStream)
+                // GZIPOutputStream(fileOutputStream)
             }
 
         /*
@@ -194,7 +203,6 @@ tasks.register("packageAndMove") {
 
     }
 }
-
 
 
 
