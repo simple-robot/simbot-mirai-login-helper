@@ -79,7 +79,7 @@ jobs:
       - name: Create github releases
         uses: softprops/action-gh-release@v0.1.14
         with:
-          files: build/compose/binaries/main/distributions/**
+          files: distributions/**
           body_path: changelog/changelog.md
           generate_release_notes: true
           draft: true
