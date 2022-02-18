@@ -1,3 +1,4 @@
+
 import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -9,7 +10,7 @@ plugins {
 }
 
 group = "love.forte.simbot"
-val subVersion = "0.6"
+val subVersion = "0.7"
 version = "3.$subVersion"
 
 repositories {
@@ -178,7 +179,11 @@ tasks.register("packageAndMove") {
 
                 currentFile.copyTo(target = newFile, overwrite = true)
 
-                // copy App?
+                //val newZipFileName = "$packageName-$os-$packageVersion.zip"
+                //val zipFile = newOutputDir.file(newZipFileName).asFile
+                //val fileOutputStream = FileOutputStream(zipFile)
+                //// copy App and zip?
+                //val zipOut = ZipOutputStream(fileOutputStream)
             }
 
         /*
