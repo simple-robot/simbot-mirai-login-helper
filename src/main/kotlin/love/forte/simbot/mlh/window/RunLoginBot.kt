@@ -43,6 +43,8 @@ import net.mamoe.mirai.BotFactory
 import org.openqa.selenium.Proxy
 import org.openqa.selenium.remote.CapabilityType
 import org.openqa.selenium.remote.DesiredCapabilities
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import java.io.ByteArrayOutputStream
 import java.net.URL
 import kotlin.coroutines.resume
@@ -54,6 +56,7 @@ class RunLoginBotState(
     val driverType: WebDriverType,
     private val doCloseRequest: () -> Unit
 ) {
+    val logger: Logger = LoggerFactory.getLogger(RunLoginBotState::class.java)
     var proxy: BrowserMobProxy? by mutableStateOf(null)
     var solver: SeleniumLoginSolver? by mutableStateOf(null)
     var bot: Bot? by mutableStateOf(null)
@@ -162,10 +165,16 @@ private fun prepareBrowserDriver(state: PrepareBrowserDriverState) {
 
     if (state.runState.solver == null) {
         LaunchedEffect(Unit) {
-            // 准备驱动
-            val solver = doPrepareBrowserDriver(state)
-            state.step = "selenium login solver准备完成"
-            state.runState.solver = solver
+            try {
+                throw IllegalStateException("test!")
+                // 准备驱动
+                val solver = doPrepareBrowserDriver(state)
+                state.step = "selenium login solver准备完成"
+                state.runState.solver = solver
+            } catch (e: Throwable) {
+                state.runState.logger.error("浏览器驱动准备失败", e)
+                state.step = "浏览器驱动准备失败！\n\n\n" + e.stackTraceToString()
+            }
         }
     }
 
@@ -264,6 +273,7 @@ private fun doLogin(state: DoLoginState) {
             }
             state.runState.bot = bot
         } catch (e: Throwable) {
+            state.runState.logger.error("登录失败", e)
             state.step = buildAnnotatedString {
                 append("登录失败! : ")
                 withStyle(SpanStyle(Color.Red)) {
@@ -460,7 +470,7 @@ private fun ColumnScope.showBot(bot: Bot) {
             modifier = Modifier.padding(10.dp),
             verticalArrangement = Arrangement.Center,
 
-        ) {
+            ) {
             Text(bot.nick)
             Text(bot.id.toString())
         }
