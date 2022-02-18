@@ -1,9 +1,9 @@
 # native package workflows
 name: build and release native distribution
-on: push
-#  push:
-#    tags:
-#      - v*.*.**
+on:
+  push:
+    tags:
+      - v*.*.**
 
 
 jobs:
@@ -72,7 +72,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: changelog.md
-          path: changelog
+          path: changelog.md
 
 
       # Releases.
@@ -80,6 +80,6 @@ jobs:
         uses: softprops/action-gh-release@v0.1.14
         with:
           files: distributions/**
-          body_path: changelog/changelog.md
+          body_path: changelog.md
           generate_release_notes: true
           draft: true
