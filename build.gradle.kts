@@ -206,13 +206,14 @@ tasks.create("createChangelog") {
         if (!file.exists()) {
             file.createNewFile()
             val autoGenerateText = """
-                simbot-mirai version: `$simbotMirai`
+                real version: `v0.$subVersion`
+                simbot-mirai version: `v$simbotMirai`
 
 
 
                 ## 其他说明
                 #### 版本号
-                目前版本 `3.$subVersion` 等同于 `0.$subVersion`, 请在脑海中自动将版本最前的数字-3。
+                目前版本 `v3.$subVersion` 等同于 `v0.$subVersion`, 请在脑海中自动将版本最前的数字-3。
                 由于 `macOS`(`dmg` & `pkg`) 打包必须保证版本号符合规则: `MAJOR[.MINOR][.PATCH]` 且:
                 - `MAJOR` 是大于0的数字;
                 - `MINOR` 是一个可选的非负整数;
