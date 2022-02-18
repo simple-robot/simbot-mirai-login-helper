@@ -72,4 +72,4 @@ jobs:
           files: ./distributions/**
           body_path: .changelog/${{ github.ref_name }}.md
           generate_release_notes: true
-          draft: true
+          # draft: true
