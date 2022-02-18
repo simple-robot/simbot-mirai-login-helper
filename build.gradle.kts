@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "love.forte.simbot"
-val subVersion = "0.7"
+val subVersion = "0.8"
 version = "3.$subVersion"
 
 repositories {
