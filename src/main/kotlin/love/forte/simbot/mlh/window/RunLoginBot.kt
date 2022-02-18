@@ -166,7 +166,6 @@ private fun prepareBrowserDriver(state: PrepareBrowserDriverState) {
     if (state.runState.solver == null) {
         LaunchedEffect(Unit) {
             try {
-                throw IllegalStateException("test!")
                 // 准备驱动
                 val solver = doPrepareBrowserDriver(state)
                 state.step = "selenium login solver准备完成"

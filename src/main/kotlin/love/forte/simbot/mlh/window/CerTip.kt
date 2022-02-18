@@ -32,7 +32,7 @@ fun ColumnScope.tip() {
     )
 
     //region 1.selenium
-    subTitle("1. selenium")
+    subTitle("1. Selenium")
 
 
     Row {
@@ -58,16 +58,44 @@ fun ColumnScope.tip() {
     }
     //endregion
 
-    subTitle("2. webdrivermanager")
+    subTitle("2. WebDriver Manager")
 
     Row {
         ClickableTextWithLinks {
             withStyle(ParagraphStyle(
                 textIndent = TextIndent(firstLine = 40.sp)
             )) {
-                append("ABC")
+                append("浏览器驱动的使用与安装，是通过")
+                appendLink("WebDriver Manager", "https://github.com/bonigarcia/webdrivermanager")
+                append("实现的。你可以在selenium的文档")
+                appendLink("安装浏览器驱动", "https://www.selenium.dev/zh-cn/documentation/webdriver/getting_started/install_drivers/#1-%E9%A9%B1%E5%8A%A8%E7%AE%A1%E7%90%86%E8%BD%AF%E4%BB%B6")
+                append("中找到其对 WebDriver Manager 的说明与介绍。")
             }
         }
+    }
+
+    subTitle("3. BrowserMob Proxy")
+
+    Row {
+        ClickableTextWithLinks {
+            withStyle(ParagraphStyle(
+                textIndent = TextIndent(firstLine = 40.sp)
+            )) {
+                append("对于滑动验证码来讲，此工具需要对所控制的浏览器进行请求捕获，因此需要使用到代理（Proxy）来监控指定请求。此工具所使用的进行代理的依赖为")
+                appendLink("BrowserMob Proxy", "https://github.com/lightbody/browsermob-proxy#readme")
+                append("。你可以在说明中的 ")
+                appendLink("Using With Selenium", "https://github.com/lightbody/browsermob-proxy#using-with-selenium")
+                append(" 处查看BrowserMob Proxy对Selenium的支持。\n\n")
+                append("同样的，下文中的 ")
+                appendLink("SSL Support", "https://github.com/lightbody/browsermob-proxy#ssl-support")
+                append(" 描述了对于SSH的支持以及 ")
+                appendLink("ca-certificate-rsa.cer", "https://github.com/lightbody/browsermob-proxy/blob/master/browsermob-core/src/main/resources/sslSupport/ca-certificate-rsa.cer")
+                append(" 文件的说明。\n\n")
+                append("因为滑动验证等相关链接是https的，因此如果想要使用代理，则需要安装此证书并将其设为信任证书，且建议在不需要使用此工具后移除此证书。")
+                append("未来也许会支持使用者生成自定义证书来提供更安全的使用。")
+            }
+        }
+
     }
 
 }
