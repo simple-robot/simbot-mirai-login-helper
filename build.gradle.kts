@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "love.forte.simbot"
-val subVersion = "0.8"
+val subVersion = "0.9"
 version = "3.$subVersion"
 
 repositories {
@@ -220,6 +220,7 @@ tasks.create("createChangelog") {
             file.createNewFile()
             val autoGenerateText = """
                 real version: `v0.$subVersion`
+                
                 simbot-mirai version: `v$simbotMirai`
 
 

@@ -472,6 +472,10 @@ private fun ColumnScope.showBot(bot: Bot) {
             ) {
             Text(bot.nick)
             Text(bot.id.toString())
+            Text("bot friend size: ${bot.friends.size}")
+            Text("bot group size:  ${bot.groups.size}")
+            Text("您的bot已经成功登录。如果不出意外的话，再次从其他地方登录bot（例如您的项目）将不会再出现验证。")
+            Text("现在您可以退出此软件，并回归到项目中了。")
         }
 
 
