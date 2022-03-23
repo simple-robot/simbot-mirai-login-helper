@@ -238,6 +238,15 @@ tasks.create("createChangelog") {
 
                 <hr>
 
+                ## 安装下载
+                从 [release](https://github.com/simple-robot/simbot-mirai-login-helper/releases/tag/v$version) 下 `Assets` 中所需安装包并下载安装。
+                
+                #### 简单指引
+                - [linux(deb)](https://github.com/simple-robot/simbot-mirai-login-helper/releases/download/v$version/simbotMiraiLoginHelper-linux-$version.deb)
+                - [linux(rpm)](https://github.com/simple-robot/simbot-mirai-login-helper/releases/download/v$version/simbotMiraiLoginHelper-linux-$version.rpm)
+                - [macOS](https://github.com/simple-robot/simbot-mirai-login-helper/releases/download/v$version/simbotMiraiLoginHelper-macOS-$version.dmg)
+                - [windows(exe)](https://github.com/simple-robot/simbot-mirai-login-helper/releases/download/v$version/simbotMiraiLoginHelper-windows-$version.exe)
+                - [windows(msi)](https://github.com/simple-robot/simbot-mirai-login-helper/releases/download/v$version/simbotMiraiLoginHelper-windows-$version.msi)
 
 
             """.trimIndent()
