@@ -52,7 +52,7 @@ fun ColumnScope.tip() {
                     "https://www.selenium.dev/zh-cn/documentation/test_practices/discouraged/captchas/"
                 )
 
-                append(" 中的提倡与描述，此工具将不会提供对滑动验证码的自动化验证.")
+                append(" 中的提倡与描述，此工具将不会提供对滑动验证码的自动化验证。")
             }
         }
     }

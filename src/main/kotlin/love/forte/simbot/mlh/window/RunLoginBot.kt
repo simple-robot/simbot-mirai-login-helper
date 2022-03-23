@@ -308,39 +308,52 @@ private fun WindowScope.onSolvePicCaptcha(state: PrepareBrowserDriverState) {
         con.cancel()
         state.onSolvePicCaptcha = null
     }
+    val verColl = rememberScrollState(0)
     Window(
         onCloseRequest = { doClose() },
         title = "图片验证码处理",
         icon = Logo.painter,
     ) {
-        Column {
-            Image(bitmap = loadImageBitmap(data.inputStream()), contentDescription = "图片验证码")
-            TextField(
-                value = textValue,
-                onValueChange = { textValue = it.trim() },
-                placeholder = { Text("输入图片验证码结果") },
-                singleLine = true,
-            )
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+        Box {
+            Box(
+                Modifier.verticalScroll(state = verColl, flingBehavior = flingBehavior())
             ) {
-                Button(
-                    onClick = {
-                        con.resume(null)
-                        state.onSolvePicCaptcha = null
+                Column {
+                    Image(bitmap = loadImageBitmap(data.inputStream()), contentDescription = "图片验证码")
+                    TextField(
+                        value = textValue,
+                        onValueChange = { textValue = it.trim() },
+                        placeholder = { Text("输入图片验证码结果") },
+                        singleLine = true,
+                    )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Button(
+                            onClick = {
+                                con.resume(null)
+                                state.onSolvePicCaptcha = null
+                            }
+                        ) {
+                            Text("刷新")
+                        }
+
+                        OutlinedButton(
+                            onClick = { doClose() }
+                        ) {
+                            Text("关闭")
+                        }
+
                     }
-                ) {
-                    Text("刷新")
                 }
 
-                OutlinedButton(
-                    onClick = { doClose() }
-                ) {
-                    Text("关闭")
-                }
-
+                VerticalScrollbar(
+                    modifier = Modifier.align(Alignment.CenterEnd), adapter = rememberScrollbarAdapter(verColl)
+                )
             }
+
         }
+
 
     }
 
@@ -476,6 +489,7 @@ private fun ColumnScope.showBot(bot: Bot) {
             Text("bot group size:  ${bot.groups.size}")
             Text("您的bot已经成功登录。如果不出意外的话，再次从其他地方登录bot（例如您的项目）将不会再出现验证。")
             Text("现在您可以退出此软件，并回归到项目中了。")
+            Text("当然，这并不是绝对的。如果你仍旧无法正常使用simbot项目，这也是常有的事情。请反馈至issue。")
         }
 
 

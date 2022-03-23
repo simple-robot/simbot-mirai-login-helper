@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "love.forte.simbot"
-val subVersion = "0.9"
+val subVersion = "0.10"
 version = "3.$subVersion"
 
 repositories {
@@ -27,7 +27,7 @@ configurations.all {
     }
 }
 
-val simbotMirai = "3.0.0.preview.3.0-292.0.1-SNAPSHOT"
+val simbotMirai = "3.0.0.preview.5.0-21000.1.0"
 
 
 dependencies {
@@ -111,17 +111,17 @@ compose.desktop {
 
 
             macOS {
-                this.iconFile.set(project.file("icon.icns"))
+                iconFile.set(project.file("icon.icns"))
             }
 
             windows {
-                this.iconFile.set(project.file("icon.ico"))
+                iconFile.set(project.file("icon.ico"))
                 shortcut = true
                 menuGroup = "simbot"
             }
 
             linux {
-                this.iconFile.set(project.file("icon.png"))
+                iconFile.set(project.file("icon.png"))
                 shortcut = true
                 debMaintainer = "ForteScarlet@163.com"
                 menuGroup = "simbot"
