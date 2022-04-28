@@ -490,6 +490,9 @@ private fun ColumnScope.showBot(bot: Bot) {
             Text("您的bot已经成功登录。如果不出意外的话，再次从其他地方登录bot（例如您的项目）将不会再出现验证。")
             Text("现在您可以退出此软件，并回归到项目中了。")
             Text("当然，这并不是绝对的。如果你仍旧无法正常使用simbot项目，这也是常有的事情。请反馈至issue。")
+            Text("下面是本次bot登录所使用的设备信息，也就是 `deviceInfo.json` 的信息。")
+
+
         }
 
 
