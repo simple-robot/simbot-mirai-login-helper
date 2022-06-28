@@ -43,6 +43,9 @@ fun FrameWindowScope.App(resetTitle: SetTitle, exit: () -> Unit) {
 @Suppress("unused")
 val globalLogger = LoggerFactory.getLogger("simbot.mirai.login.helper.main")!!
 
+/*
+    写的挺烂的，凑活用吧
+ */
 
 fun main() = application {
     val default = "simbot-mirai登录工具"

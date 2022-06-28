@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.6.10"
     kotlin("plugin.serialization") version "1.6.10"
-    id("org.jetbrains.compose") version "1.0.1"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 group = "love.forte.simbot"
@@ -27,7 +27,8 @@ configurations.all {
     }
 }
 
-val simbotMirai = "3.0.0.preview.5.0-21000.1.0"
+val simbot = "3.0.0.preview.17.0"
+val simbotMirai = "3.0.0.0.preview.11.0"
 
 
 dependencies {
@@ -54,6 +55,7 @@ dependencies {
     implementation("com.google.zxing:javase:3.4.1")
     // simbot3-mirai
     implementation("love.forte.simbot.component:simbot-component-mirai-core:$simbotMirai")
+    implementation("love.forte.simbot:simbot-core:$simbot")
 
     // log4j2
     implementation("org.apache.logging.log4j:log4j-api:2.17.1")
